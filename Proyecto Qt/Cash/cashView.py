@@ -6,3 +6,4 @@ class CashView(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Vista de Caja"))
         self.setLayout(layout)
+      

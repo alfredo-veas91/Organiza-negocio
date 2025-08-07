@@ -1,9 +1,10 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-                             QLabel, QFormLayout, QSizePolicy, QDialog)
+                             QLabel, QFormLayout, QSizePolicy, QDialog, QStackedLayout)
 from PyQt6.QtCore import Qt
 
-from Cash.cashWindow import CashWindow  # Renombrado
-from Cash.cashView import CashView  # Renombrado
+from Cash.cashWindow import CashWindow  
+from Cash.cashView import CashView 
+from Sales.saleView import SaleView
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -13,7 +14,7 @@ class MainWindow(QWidget):
         self.connect_events()
 
     def setup_ui(self):
-        self.setWindowTitle("Mi Aplicación Funcional")
+        self.setWindowTitle("Organiza negocio")
         self.setGeometry(100, 100, 700, 500)
 
         main_layout = QVBoxLayout()
@@ -27,7 +28,7 @@ class MainWindow(QWidget):
         self.setLayout(main_layout)
 
     def create_title(self, layout):
-        self.title_label = QLabel("Mi Aplicación")
+        self.title_label = QLabel("Organiza negocio")
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title_label.setStyleSheet("""
             font-size: 18px; 
@@ -73,8 +74,18 @@ class MainWindow(QWidget):
             """)
 
     def create_work_area(self, layout):
-        self.center_layout = QFormLayout()
-        layout.addLayout(self.center_layout)
+        self.stack = QStackedLayout()
+       
+        self.cashView = CashView()
+        self.saleView = SaleView()
+
+        self.stack.addWidget(self.cashView) #0
+        self.stack.addWidget(self.saleView) #1
+
+        from PyQt6.QtWidgets import QWidget
+        container= QWidget()
+        container.setLayout(self.stack)
+        layout.addWidget(container)
 
     def create_bottom_bar(self, layout):
         bottom_layout = QHBoxLayout()
@@ -113,6 +124,7 @@ class MainWindow(QWidget):
         self.btn_exit.clicked.connect(self.close)
 
     def open_cash_window(self):
+        self.stack.setCurrentIndex(0)  # Cambia a la vista de caja
         dialog = CashWindow(self.cash_total, self)
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -121,6 +133,7 @@ class MainWindow(QWidget):
 
     def open_sales_window(self):
         print("Abrir ventana de ventas - Por implementar")
+        self.stack.setCurrentIndex(1)  # Cambia a la vista de ventas
 
     def open_inventory_window(self):
         print("Abrir ventana de inventario - Por implementar")
