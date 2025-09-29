@@ -1,21 +1,23 @@
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QMessageBox, QSizePolicy
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QSizePolicy
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QDoubleValidator
 
+
 class CashWindow(QDialog):
     def __init__(self, current_cash, parent=None):
-        super().__init__()
+        super().__init__(parent)
         self.current_cash = current_cash
-        self.entered_amount = 0.0
         self.setWindowTitle("Caja")
-        self.init_ui()
+        self.entered_amount = 0.0
+        self._init_ui()
 
-    def init_ui(self):
+    def _init_ui(self):
         self.setFixedSize(300, 200)
         self.setModal(True)
 
         layout = QVBoxLayout()
 
+        # --- Título ---
         title = QLabel("Gestión de Caja")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("""
@@ -25,6 +27,7 @@ class CashWindow(QDialog):
             margin: 10px;
         """)
 
+        # --- Dinero actual ---
         self.cash_label = QLabel(f"Dinero en caja: ${self.current_cash:.2f}")
         self.cash_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cash_label.setStyleSheet("""
@@ -37,6 +40,7 @@ class CashWindow(QDialog):
             margin: 5px;
         """)
 
+        # --- Input ---
         self.amount_input = QLineEdit()
         self.amount_input.setPlaceholderText("Ingrese monto a agregar")
 
@@ -56,8 +60,8 @@ class CashWindow(QDialog):
             }
         """)
 
+        # --- Botones ---
         self.buttons_layout = QHBoxLayout()
-
         self.btn_add = QPushButton("Agregar Dinero")
         self.btn_remove = QPushButton("Quitar Dinero")
         self.btn_exit = QPushButton("Salir")
@@ -78,49 +82,9 @@ class CashWindow(QDialog):
             """)
             self.buttons_layout.addWidget(btn)
 
+        # --- Armado layout ---
         layout.addWidget(title)
         layout.addWidget(self.cash_label)
         layout.addWidget(self.amount_input)
         layout.addLayout(self.buttons_layout)
         self.setLayout(layout)
-
-        self.connect_events()
-
-    def connect_events(self):
-        self.btn_add.clicked.connect(self.add_money)
-        self.btn_remove.clicked.connect(self.remove_money)
-        self.btn_exit.clicked.connect(self.reject)
-        self.amount_input.returnPressed.connect(self.add_money)
-
-    def add_money(self):
-        amount = self.get_amount()
-        if amount is not None:
-            self.entered_amount += amount
-            QMessageBox.information(self, "Éxito", f"Se han agregado ${amount:.2f} a la caja.")
-            self.accept()
-
-    def remove_money(self):
-        amount = self.get_amount()
-        if amount is not None:
-            if amount > self.current_cash:
-                QMessageBox.warning(self, "Error", "No hay suficiente dinero en caja para quitar esa cantidad.")
-            else:
-                self.entered_amount -= amount
-                QMessageBox.information(self, "Éxito", f"Se han quitado ${amount:.2f} de la caja.")
-                self.accept()
-
-    def get_amount(self):
-        text = self.amount_input.text().strip()
-        if not text:
-            QMessageBox.warning(self, "Error", "Por favor, ingrese un monto válido.")
-            self.amount_input.setFocus()
-            return None
-        try:
-            amount = float(text)
-            if amount <= 0:
-                raise ValueError("El monto debe ser positivo.")
-            return amount
-        except ValueError as e:
-            QMessageBox.warning(self, "Error", f"Entrada inválida: {e}. Por favor, ingrese un monto válido.")
-            self.amount_input.setFocus()
-            return None

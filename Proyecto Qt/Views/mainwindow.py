@@ -1,17 +1,17 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-                             QLabel, QFormLayout, QSizePolicy, QDialog, QStackedLayout)
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QLabel, QSizePolicy, QStackedLayout
+)
 from PyQt6.QtCore import Qt
 
-from Cash.cashWindow import CashWindow  
-from Cash.cashView import CashView 
-from Sales.saleView import SaleView
+from Views.cashView import CashView
+from Views.saleView import SaleView
+
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.cash_total = 0.0
         self.setup_ui()
-        self.connect_events()
 
     def setup_ui(self):
         self.setWindowTitle("Organiza negocio")
@@ -75,22 +75,22 @@ class MainWindow(QWidget):
 
     def create_work_area(self, layout):
         self.stack = QStackedLayout()
-       
+
         self.cashView = CashView()
         self.saleView = SaleView()
 
-        self.stack.addWidget(self.cashView) #0
-        self.stack.addWidget(self.saleView) #1
+        self.stack.addWidget(self.cashView)  # 0
+        self.stack.addWidget(self.saleView)  # 1
 
         from PyQt6.QtWidgets import QWidget
-        container= QWidget()
+        container = QWidget()
         container.setLayout(self.stack)
         layout.addWidget(container)
 
     def create_bottom_bar(self, layout):
         bottom_layout = QHBoxLayout()
 
-        self.status_label = QLabel(f"Dinero en caja: ${self.cash_total:.2f}")
+        self.status_label = QLabel("Dinero en caja: $0.00")
         self.status_label.setStyleSheet("""
             color: #27ae60;
             font-size: 14px;
@@ -116,37 +116,13 @@ class MainWindow(QWidget):
 
         layout.addLayout(bottom_layout)
 
-    def connect_events(self):
-        self.btn_cash.clicked.connect(self.open_cash_window)
-        self.btn_sales.clicked.connect(self.open_sales_window)
-        self.btn_inventory.clicked.connect(self.open_inventory_window)
-        self.btn_suppliers.clicked.connect(self.open_suppliers_window)
-        self.btn_exit.clicked.connect(self.close)
+    # 🔹 Método público para que CashController actualice la vista
+    def update_cash_display(self, new_total: float):
+        self.status_label.setText(f"Dinero en caja: ${new_total:.2f}")
 
-    def open_cash_window(self):
-        self.stack.setCurrentIndex(0)  # Cambia a la vista de caja
-        dialog = CashWindow(self.cash_total, self)
-
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.cash_total += dialog.entered_amount
-            self.update_cash_display()
-
-    def open_sales_window(self):
-        print("Abrir ventana de ventas - Por implementar")
-        self.stack.setCurrentIndex(1)  # Cambia a la vista de ventas
-
-    def open_inventory_window(self):
-        print("Abrir ventana de inventario - Por implementar")
-
-    def open_suppliers_window(self):
-        print("Abrir ventana de proveedores - Por implementar")
-
-    def update_cash_display(self):
-        self.status_label.setText(f"Dinero en caja: ${self.cash_total:.2f}")
-
-        if self.cash_total < 0:
+        if new_total < 0:
             color = "#e74c3c"
-        elif self.cash_total == 0:
+        elif new_total == 0:
             color = "#f39c12"
         else:
             color = "#27ae60"
