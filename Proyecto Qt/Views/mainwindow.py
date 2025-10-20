@@ -7,6 +7,9 @@ from PyQt6.QtCore import Qt
 from Views.cashView import CashView
 from Views.saleView import SaleView
 
+from Views.supplierView import SupplierView
+from Controllers.supplierController import SupplierController
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -78,9 +81,12 @@ class MainWindow(QWidget):
 
         self.cashView = CashView()
         self.saleView = SaleView()
-
+        self.supplierView = SupplierView()
+        
         self.stack.addWidget(self.cashView)  # 0
         self.stack.addWidget(self.saleView)  # 1
+        self.stack.addWidget(self.supplierView)  # 2
+
 
         from PyQt6.QtWidgets import QWidget
         container = QWidget()
