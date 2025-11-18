@@ -29,6 +29,18 @@ def add_supplier(rut, name, email, encargado, phone, category, status):
     conn.commit()
     conn.close()
 
+def delete_supplier(supplier_id: int) -> int:
+    """
+    Borra el proveedor por su id.
+    Devuelve el número de filas eliminadas (0 = no existe).
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM suppliers WHERE id = ?", (supplier_id,))
+    conn.commit()
+    deleted = cursor.rowcount
+    conn.close()
+    return deleted
 
 def get_all_suppliers():
     conn = get_connection()
